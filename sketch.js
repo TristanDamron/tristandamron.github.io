@@ -36,7 +36,14 @@ function draw() {
         if (waves.length < 20) {
             createWave();        
         }
-    }    
+    }
+    
+    if (waves.length >= 20) {
+        textSize(32);
+        fill(255,255,255);
+        textAlign(CENTER);
+        text("Press C to start a new storm.", windowWidth / 2, windowHeight / 2);
+    }
 }
 
 function keyPressed() {
