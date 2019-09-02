@@ -1,25 +1,42 @@
 let waves = [];
-let waveDelay = 25;
+let waveDelay = 30;
 let time = waveDelay;
-let maxRadius = 200;
+let firstRemoved = false;
+let piano;
+
+function preload() {
+    piano = [loadSound("/sfx/rain.mp3"), loadSound("/sfx/rain.mp3"),loadSound("/sfx/rain.mp3"), loadSound("/sfx/rain.mp3"), loadSound("/sfx/wave1.wav"), loadSound("/sfx/wave1.wav")];
+}
 
 function setup() {
-    createCanvas(800, 800);
+    createCanvas(windowWidth, windowHeight);            
 }
 
 function draw() {    
     time++; 
+
+    if (waves.length != 0) {
+        for (let i = 0; i < piano.length; i++) {
+            piano[i].setVolume(1 + (1 / waves.length));
+        }
+    }
+
     clear();
-    ripple();
-    bounce();
+    ripple();    
     
     if (time % waveDelay == 0) {
-        createWave();    
+        if (waves.length < 20) {
+            createWave();        
+        }
+        
     }    
 }
 
 function keyPressed() {
     if (keyCode === 67) {
+        for (let i = 0; i < waves.length; i++) {
+            waves[i].sfx.stop();
+        }
         waves = [];
     } 
 }
@@ -27,19 +44,19 @@ function keyPressed() {
 
 // Grow or shrink the waves
 function ripple() {
-    for (let i = 0; i < waves.length - 1; i++) {
+    for (let i = 0; i < waves.length; i++) {
         fill(waves[i].color);
         noStroke();
         ellipse(waves[i].x, waves[i].y, waves[i].radius, waves[i].radius);
 
-        if (waves.length >= 2) {
+        if (waves.length >= 2) {            
             detectCollisions();
+            bounce();
         }
         
-        if (waves[i].radius < 50) {
+        if (waves[i].radius < 0) {
             waves[i].direction = 1;
-        } else if (waves[i].radius > maxRadius) {
-            waves[i].direction = -1;
+            waves[i].canPlaySFX = true;
         }
 
         waves[i].radius += 1 * waves[i].direction;
@@ -47,56 +64,66 @@ function ripple() {
 }
 
 function bounce() {
-    for (let i = 0; i < waves.length; i++) {
-        if (waves[i].velX > 0) {
-            waves[i].x += waves[i].velX;
-            waves[i].velX--;
-        } else if (waves[i].velX > 0) {
-            waves[i].x += waves[i].velX;
-            waves[i].velX++;
-        }
-        
-        if (waves[i].velY > 0) {
-            waves[i].y += waves[i].velX;            
-            waves[i].velY--;
-        } else if (waves[i] < 0) {
-            waves[i].y += waves[i].velX;
-            waves[i].velY++;
-        }     
-    }    
+    for (let i = 0; i < waves.length; i++) {        
+        let v1 = createVector(waves[i].velX, waves[i].velY);
+        let v2 = createVector(0, 0);
+
+        let v3 = p5.Vector.lerp(v1, v2, 0.001);         
+        waves[i].velX = v3.x;
+        waves[i].velY = v3.y;        
+
+        waves[i].x -= waves[i].velX;
+        waves[i].y -= waves[i].velY;
+    }
 }
 
 function detectCollisions() {
     for (let i = 0; i < waves.length; i++) {
-        for (let j = 0; j < waves.length - 1; j++) {
+        for (let j = 1; j < waves.length; j++) {
             let wave1 = waves[i];
             let wave2 = waves[j];
 
             let v1 = createVector(wave1.x, wave1.y);
-            let v2 = createVector(wave2.x, wave2.y);
-            
-            if (v1.dist(v2) <= wave1.radius && wave1.direction != -1) {
-                wave1.touched = true;                
-                wave1.direction = wave1.direction * -1;            
-                wave2.direction = wave2.direction * -1;     
-                wave1.velX = Math.random() * 200;      
-                wave1.velY = Math.random() * 200;    
+            let v2 = createVector(wave2.x, wave2.y);                    
+
+            if (v1.dist(v2) < (wave2.radius + wave1.radius) / 2
+                && wave1.direction != -1
+                && v1.dist(v2) > 0) {                 
+
+                wave1.direction = -1;            
+                wave2.direction = -1;  
+
+                if (wave1.canPlaySFX && wave2.canPlaySFX) {
+                    wave1.sfx.play();                
+                    wave2.sfx.play();
+                    wave1.canPlaySFX = false;
+                    wave2.canPlaySFX = false;
+                }
+                wave1.velX = (Math.floor(Math.random() * (1 - (-1) + 1) + -1)) / 25;
+                wave1.velY = (Math.floor(Math.random() * (1 - (-1) + 1) + -1)) / 25;
+                wave2.velX = (Math.floor(Math.random() * (1 - (-1) + 1) + -1)) / 25;
+                wave2.velY = (Math.floor(Math.random() * (1 - (-1) + 1) + -1)) / 25;
             }
         }
     }
 }
 
 function createWave() {
-    if (mouseIsPressed) {       
+    if (mouseIsPressed) { 
+        let waveColor = Math.random() * 255;      
         let wave = {
             x : mouseX,
             y : mouseY,
             velX : 0,
             velY : 0,
             radius: 1,
-            color: color(Math.random() * 255, Math.random() * 255, Math.random() * 255),
-            direction: 1            
+            color: color(waveColor, waveColor, waveColor),
+            direction: 1, 
+            sfx: piano[Math.floor(Math.random() * piano.length)], 
+            canPlaySFX: true
         }
+
+        wave.sfx.play();
         waves.push(wave);
     } 
 }

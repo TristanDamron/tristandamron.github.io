@@ -6,10 +6,45 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.sound.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="sketch.js"></script>
     <title>Waves</title>
+    <style>
+        body {
+            background-color: #484f52;
+            color: whitesmoke;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .welcome {
+            position: absolute;
+            height: 100%;
+            width: 100%;     
+            text-align: center;
+            padding-top: 10%;       
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="welcome">
+        <h1>Welcome.</h1>
+        <p>This is your personal sound storm. Click and drag anywhere on the screen to start.</p>
+        <p>Press C to start a new storm.</p>
+        <br>
+        <br>
+        <i>The more storm clouds you create, the louder the storm will be! 
+            <br>
+            <br>
+        The more the clouds bump together, the more chaotic the storm will become.</i>
+        <br>
+        <br>
+        <br>
+        <b>Headphones are strongly recommended.</b>
+    </div>
+    <script>
+        $(".welcome").click(() => {
+            $(".welcome").fadeOut("slow", () => {});
+        });
+    </script>
 </body>
 </html>
