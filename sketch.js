@@ -1,8 +1,13 @@
 let waves = [];
+let circles = [];
 let waveDelay = 15;
 let time = waveDelay;
 let firstRemoved = false;
 let piano;
+let pastFrames = [];
+let numFrames = 256;
+let step, windowStep;
+let canvas;
 
 function preload() {
     piano = [loadSound("/sfx/rain.mp3"),
@@ -11,7 +16,15 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);            
+    canvas = createCanvas(windowWidth, windowHeight);  
+    
+    step = windowHeight / numFrames;
+    windowStep = windowHeight / numFrames;
+
+    for(let i = 0; i<numFrames; i++){
+        let p = createGraphics(windowWidth, windowHeight);
+        pastFrames.push(p);
+    }
 }
 
 function draw() {    
@@ -25,18 +38,47 @@ function draw() {
 
     clear();
     ripple();    
-    
+    // growCircles();
+
     if (time % waveDelay == 0) {
         if (waves.length < 20) {
             createWave();        
         }
     }
-    
+
+    pastFrames[0].image(canvas, 0, 0, windowWidth, windowHeight);
+
+    // draw our slit scan to the screen
+    // we loop through all the frames and draw a slice at each step along the y axis
+    for(let i = 0; i<pastFrames.length; i++){
+        // image(img, x, y, w, h, srcX, srcY, srcW, srcH);
+        image(pastFrames[i], 0, windowStep * i, windowWidth, windowStep, 0, step*i, windowWidth, step);
+    }
+
+    // move every element forward by 1, except the last element
+    // this is important to keep the frames cycling 
+    // otherwise we'd just see one frame updating at a time
+    for(let i = 0; i<pastFrames.length-1; i++){
+        pastFrames[i] = pastFrames[i+1];
+    }
+
+    // move the last element to the beginning
+    pastFrames[pastFrames.length-1] = pastFrames[0];
+
     if (waves.length >= 20) {
         textSize(32);
-        fill(255,255,255);
+        fill(255, 255, 255);
         textAlign(CENTER);
         text("Press C to start a new storm.", windowWidth / 2, windowHeight / 2);
+    }    
+}
+
+function growCircles() {
+    for (let i = 0; i < circles.length; i++) {
+        noFill();
+        stroke(255, 255, 255);
+        circle(circles[i].x, circles[i].y, circles[i].radius * 2);
+        circles[i].radius += 5;
     }
 }
 
@@ -46,6 +88,11 @@ function keyPressed() {
             waves[i].sfx.stop();
         }
         waves = [];
+        pastFrames = [];
+        for(let i = 0; i<numFrames; i++){
+            let p = createGraphics(windowWidth, windowHeight);
+            pastFrames.push(p);
+        }        
     } 
 }
 
@@ -107,6 +154,10 @@ function detectCollisions() {
                     wave1.canPlaySFX = false;
                     wave2.canPlaySFX = false;
                 }
+
+                circles.push(createCircle(wave1.x, wave1.y, wave1.radius / 2));
+                circles.push(createCircle(wave2.x, wave2.y, wave2.radius / 2));
+
                 wave1.velX = (Math.floor(Math.random() * (1 - (-1) + 1) + -1)) / 25;
                 wave1.velY = (Math.floor(Math.random() * (1 - (-1) + 1) + -1)) / 25;
                 wave2.velX = (Math.floor(Math.random() * (1 - (-1) + 1) + -1)) / 25;
@@ -134,4 +185,14 @@ function createWave() {
         wave.sfx.play();
         waves.push(wave);
     } 
+}
+
+function createCircle(xPos, yPos, r) {
+    let circle = {
+        x : xPos,
+        y : yPos,
+        radius : r
+    }
+
+    return circle;
 }
