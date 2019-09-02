@@ -5,7 +5,7 @@ let time = waveDelay;
 let firstRemoved = false;
 let piano;
 let pastFrames = [];
-let numFrames = 256;
+let numFrames = 100;
 let step, windowStep;
 let canvas;
 
