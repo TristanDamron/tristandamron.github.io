@@ -5,7 +5,15 @@ let firstRemoved = false;
 let piano;
 
 function preload() {
-    piano = [loadSound("/sfx/rain.mp3"), loadSound("/sfx/rain.mp3"),loadSound("/sfx/rain.mp3"), loadSound("/sfx/rain.mp3"), loadSound("/sfx/wave1.wav"), loadSound("/sfx/wave1.wav")];
+    piano = [loadSound("/sfx/rain.mp3"), 
+             loadSound("/sfx/rain.mp3"),
+             loadSound("/sfx/rain.mp3"), 
+             loadSound("/sfx/rain.mp3"), 
+             loadSound("/sfx/wave1.wav"), 
+             loadSound("/sfx/wave1.wav"), 
+             loadSound("/sfx/bass1.mp3"), 
+             loadSound("/sfx/bass1.mp3"), 
+             loadSound("/sfx/bass1.mp3")];
 }
 
 function setup() {
@@ -28,7 +36,6 @@ function draw() {
         if (waves.length < 20) {
             createWave();        
         }
-        
     }    
 }
 
