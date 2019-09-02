@@ -1,5 +1,5 @@
 let waves = [];
-let waveDelay = 30;
+let waveDelay = 15;
 let time = waveDelay;
 let firstRemoved = false;
 let piano;
