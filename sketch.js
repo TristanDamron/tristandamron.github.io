@@ -5,14 +5,8 @@ let firstRemoved = false;
 let piano;
 
 function preload() {
-    piano = [loadSound("/sfx/rain.mp3"), 
-             loadSound("/sfx/rain.mp3"),
-             loadSound("/sfx/rain.mp3"), 
-             loadSound("/sfx/rain.mp3"), 
-             loadSound("/sfx/wave1.wav"), 
-             loadSound("/sfx/wave1.wav"), 
-             loadSound("/sfx/bass1.mp3"), 
-             loadSound("/sfx/bass1.mp3"), 
+    piano = [loadSound("/sfx/rain.mp3"),
+             loadSound("/sfx/wave1.wav"),                           
              loadSound("/sfx/bass1.mp3")];
 }
 
