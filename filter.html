@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/ml5@0.3.1/dist/ml5.min.js"></script>    
+    <title>Filters with ML5!</title>
+    <style>
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>        
+    <center>
+        <canvas height="1000" width="1400" id="myCanvas"></canvas>    
+    </center>
+    
+    <video height="1000" width="1400" autoplay="true" id="video"></video>
+    <img id="mouth" hidden="true" height="300px" width="300px" src="img/mouth.png"/>    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            var video = document.getElementById("video");
+            var poseNet;
+            
+            var mouth = document.getElementById("mouth");            
+            var c = document.getElementById("myCanvas");                        
+                        
+            if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;                
+                    poseNet = createPoseNet();
+                    poseNet.on('pose', function(results) {
+                        
+                        var ctx = c.getContext("2d");
+                        ctx.clearRect(0, 0, c.width, c.height);
+                        ctx.beginPath();
+                        // x y radius
+                        ctx.arc(results[0].pose.leftEye.x, results[0].pose.leftEye.y, 80, 0, 2 * Math.PI);
+                        ctx.arc(results[0].pose.rightEye.x, results[0].pose.rightEye.y, 80, 0, 2 * Math.PI);
+                        ctx.fillStyle = "white";
+                        ctx.fill();                                        
+                        ctx.beginPath();
+                        ctx.arc(results[0].pose.leftEye.x, results[0].pose.leftEye.y, 40, 0, 2 * Math.PI);
+                        ctx.arc(results[0].pose.rightEye.x, results[0].pose.rightEye.y, 20, 0, 2 * Math.PI);
+                        ctx.fillStyle = "black";
+                        ctx.fill();                     
+                        ctx.drawImage(mouth, results[0].pose.nose.x - (mouth.width / 2), results[0].pose.nose.y, mouth.width, mouth.height);
+                    });  
+                })
+                .catch(function (err0r) {
+                    console.log(err0r);
+                });
+            }   
+            function createPoseNet() {
+                var poseNet = ml5.poseNet(video, function(err) {                        
+                        console.log("Model loaded successfully");                        
+                    }
+                );
+                return poseNet;
+            }
+        });
+    </script>
+</body>
+</html>
