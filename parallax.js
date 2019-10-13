@@ -4,6 +4,10 @@ let rightCenter = undefined;
 let left = undefined;
 let right = undefined;
 
+let loading = true;
+let loadingRingRadius = 75;
+let loadingRingShrinking = false;
+
 document.addEventListener("DOMContentLoaded", function(event) {
     const video = document.getElementById("video");
 
@@ -15,7 +19,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     console.log("Model loaded");
                 });      
                 
-                poseNet.on("pose", function (results) {                
+                poseNet.on("pose", function (results) {    
+                    loading = false;
+
                     left = [];
                     right = [];
     
@@ -63,11 +69,33 @@ function draw() {
 
     rectMode(CENTER);
     
+
     push();              
     fill(colors[0]);
     noStroke();
-    translate(0, 0);
+    // translate(0, 0);
 
+    if (loading) {
+        fill(color(255, 0, 0));
+        circle(0, -200, 50);
+        noFill();
+        stroke(color(255, 0, 0));
+        circle(0, -200, loadingRingRadius);
+
+
+        if (!loadingRingShrinking) {
+            loadingRingRadius++;
+        } else {
+            loadingRingRadius--;
+        }
+
+        if (loadingRingRadius > 120) {
+            loadingRingShrinking = true;
+        } else if (loadingRingRadius <= 75) {
+            loadingRingShrinking = false;
+        }
+    }
+    
     if (left && right) {                 
         for (var i = 1; i < slider.value(); i++) {
             scale(1 - (0.01 * i));                    
