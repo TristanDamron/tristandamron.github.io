@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     if (navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'user'}})
-            .then(function (stream) {
+            .then(function success(stream) {
                 video.srcObject = stream;                
                 const poseNet = ml5.poseNet(video, function () {
                     console.log("Model loaded");
