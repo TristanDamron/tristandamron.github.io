@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const video = document.getElementById("video");
 
     if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment'}})
+        navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment' }})
             .then(function success(stream) {
                 video.srcObject = stream;                
                 const poseNet = ml5.poseNet(video, function () {
